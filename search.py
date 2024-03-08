@@ -87,6 +87,28 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    def solve(stack: list, start):
+        stack.append(start)
+        start_pos = start[0]
+
+        if problem.isGoalState(start_pos):  
+            return stack
+        
+        sucessors = problem.getSuccessors(start_pos)
+        
+        for s in sucessors:
+            pos, direction, _ = s
+            if pos in [item[0] for item in stack]:
+                continue
+            new_stack = solve(stack.copy(), (pos, direction))
+            if new_stack: return new_stack
+        return None
+
+
+    cur_pos = problem.getStartState()
+    result = [direction for _, direction in solve([], (cur_pos, ''))[1:]]
+    
+    return result
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
