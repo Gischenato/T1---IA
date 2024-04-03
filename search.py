@@ -153,7 +153,6 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     from util import PriorityQueueWithFunction
-
     def getPriority(item):
         return item[1]
     pQueue = PriorityQueueWithFunction(getPriority)
@@ -205,7 +204,52 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueueWithFunction
+    from searchAgents import manhattanHeuristic
+
+    # print("aqui")
+
+    def getPriority(item):
+        return item[1]
+    pQueue = PriorityQueueWithFunction(getPriority)
+
+    start = problem.getStartState()
+    visited = set()
+    visited.add(start)
+    path = {}
+    path[start] = ('', '', 0 + manhattanHeuristic(start, problem))
+    pQueue.push((start, 0 + manhattanHeuristic(start, problem)))
+    find = False
+    final = None
+    while not pQueue.isEmpty():
+        # print('--- P QUEUE ---')
+        # print(pQueue)
+        # if find: break
+        current, curr_cost = pQueue.pop()
+        print(problem.goal)
+        # print(current)
+        if problem.isGoalState(current):
+            break
+        for pos, direction, cost in problem.getSuccessors(current):
+            if pos in visited:
+                if path[pos][2] > curr_cost + cost + manhattanHeuristic(pos, problem):
+                    path[pos] = (current, direction, curr_cost+cost+manhattanHeuristic(pos, problem))
+            else:
+                pQueue.push((pos, cost + curr_cost+manhattanHeuristic(pos, problem)))
+                visited.add(pos)
+                path[pos] = (current, direction, curr_cost+cost+manhattanHeuristic(pos, problem))
+                if problem.isGoalState(pos):
+                    final = pos
+    curr = final
+    res = []
+    print('------------------------')
+    # for p in path:
+        # print(f'{p}: {path[p]}')
+    while curr != start:
+        curr, direction, cost = path[curr]
+        res.append(direction)
+    res.reverse()
+    return res
 
 
 # Abbreviations
