@@ -205,39 +205,42 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     from util import PriorityQueueWithFunction
-    from searchAgents import manhattanHeuristic
-
+    # from searchAgents import manhattanHeuristic
+    # print(heuristic.__class__.__name__)
     # print("aqui")
 
     def getPriority(item):
-        return item[1]
+        return item[2]
     pQueue = PriorityQueueWithFunction(getPriority)
 
     start = problem.getStartState()
     visited = set()
     visited.add(start)
     path = {}
-    path[start] = ('', '', 0 + manhattanHeuristic(start, problem))
-    pQueue.push((start, 0 + manhattanHeuristic(start, problem)))
+    path[start] = ('', '', 0)
+    pQueue.push((start, 0, heuristic(start, problem)))
     find = False
     final = None
     while not pQueue.isEmpty():
         # print('--- P QUEUE ---')
         # print(pQueue)
         # if find: break
-        current, curr_cost = pQueue.pop()
-        print(problem.goal)
+        current, curr_cost, total_cost = pQueue.pop()
+        print(f'{current}: {curr_cost} {total_cost}')
+        # print(problem.goal)
         # print(current)
         if problem.isGoalState(current):
             break
         for pos, direction, cost in problem.getSuccessors(current):
+            # print(heuristic(pos, problem))
             if pos in visited:
-                if path[pos][2] > curr_cost + cost + manhattanHeuristic(pos, problem):
-                    path[pos] = (current, direction, curr_cost+cost+manhattanHeuristic(pos, problem))
+                if path[pos][2] > curr_cost + cost:
+                    path[pos] = (current, direction, curr_cost+cost)
+                    pQueue.push((pos, curr_cost + cost, curr_cost + cost + heuristic(pos, problem)))
             else:
-                pQueue.push((pos, cost + curr_cost+manhattanHeuristic(pos, problem)))
+                pQueue.push((pos, cost + curr_cost, cost + curr_cost + heuristic(pos, problem)))
                 visited.add(pos)
-                path[pos] = (current, direction, curr_cost+cost+manhattanHeuristic(pos, problem))
+                path[pos] = (current, direction, curr_cost+cost)
                 if problem.isGoalState(pos):
                     final = pos
     curr = final
@@ -248,6 +251,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     while curr != start:
         curr, direction, cost = path[curr]
         res.append(direction)
+        print(f'{curr}: {direction} {cost}')
     res.reverse()
     return res
 
